@@ -3,8 +3,32 @@ import pandas as pd
 from PIL import Image
 import json
 
+from pathlib import Path
+
 # 设置图片文件夹路径
 IMAGE_BASE_FOLDER = 'images'
+
+
+def check_folder_structure(folder_path):
+    base_path = Path(folder_path)
+    # 检查顶层文件夹
+    for item in base_path.iterdir():
+        if item.is_file():
+            raise ValueError(f"当前文件夹 '{base_path}' 下存在文件 '{item.name}'，不符合要求。")
+    # 检查子文件夹
+    for subdir in base_path.iterdir():
+        if subdir.is_dir():
+            for subitem in subdir.iterdir():
+                if subitem.is_dir():
+                    raise ValueError(f"子文件夹 '{subdir}' 下存在文件夹 '{subitem.name}'，不符合要求。")
+
+# 使用示例
+try:
+    check_folder_structure(IMAGE_BASE_FOLDER)
+    print("文件夹结构符合要求。")
+except ValueError as e:
+    print(e)
+
 
 # 初始化列表来存储文件信息
 data = []
