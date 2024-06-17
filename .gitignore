@@ -1,0 +1,8 @@
+﻿images
+images2
+images*
+*.png
+*.jpg
+*.jpeg
+node_modules
+*.tar.gz

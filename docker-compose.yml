@@ -1,0 +1,19 @@
+﻿services:
+  my-rdimg-app:
+    container_name: my-rdimg-app
+    image: my-rdimg-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "2113:2113"
+    volumes:
+      - ./images:/usr/src/app/images
+      - ./images_info.json:/usr/src/app/images_info.json
+    networks:
+      - 1panel-network
+    restart: always
+
+networks:
+    1panel-network:
+        external: true
