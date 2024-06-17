@@ -138,31 +138,31 @@ func handleRandomImage(w http.ResponseWriter, r *http.Request) {
 	var contentType string
 
 	switch imageType {
-		case "jpeg", "jpg":
+	case "jpeg", "jpg":
+		buffer, err = encodeJPEG(img)
+		contentType = "image/jpeg"
+	case "png":
+		buffer, err = encodePNG(img)
+		contentType = "image/png"
+	case "webp":
+		buffer, err = webpEncode(img)
+		contentType = "image/webp"
+	default:
+		ext := filepath.Ext(selectedImage.File)
+		switch ext {
+		case ".jpg", ".jpeg":
 			buffer, err = encodeJPEG(img)
 			contentType = "image/jpeg"
-		case "png":
+		case ".png":
 			buffer, err = encodePNG(img)
 			contentType = "image/png"
-		case "webp":
+		case ".webp":
 			buffer, err = webpEncode(img)
 			contentType = "image/webp"
 		default:
-			ext := filepath.Ext(selectedImage.File)
-			switch ext {
-			case ".jpg", ".jpeg":
-				buffer, err = encodeJPEG(img)
-				contentType = "image/jpeg"
-			case ".png":
-				buffer, err = encodePNG(img)
-				contentType = "image/png"
-			case ".webp":
-				buffer, err = webpEncode(img)
-				contentType = "image/webp"
-			default:
-				buffer, err = encodeJPEG(img)
-				contentType = "image/jpeg"
-			}
+			buffer, err = encodeJPEG(img)
+			contentType = "image/jpeg"
+		}
 	}
 
 	if err != nil {
@@ -207,7 +207,12 @@ func encodePNG(img image.Image) ([]byte, error) {
 
 func webpEncode(img image.Image) ([]byte, error) {
 	var buf bytes.Buffer
-	err := webp.Encode(&buf, img, &webp.Options{Quality: 90})
+	// WebP 无损压缩
+	options := webp.Options{
+		Lossless: true, // 无损压缩
+		Quality:  90,   // 这个参数对无损压缩无效，可以保留或忽略
+	}
+	err := webp.Encode(&buf, img, &options)
 	if err != nil {
 		return nil, fmt.Errorf("WebP encoding error: %v", err)
 	}
